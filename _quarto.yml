@@ -1,0 +1,34 @@
+project:
+  title: "website"
+
+website:
+  repo-url: https://github.com/kelly-sovacool/user-interfaces
+  site-url: https://sovacool.dev/user-interfaces
+  repo-actions: [edit, issue]
+  twitter-card:
+    creator: "@kelly_sovacool"
+  open-graph: true
+  navbar:
+    search: true
+
+execute:
+  freeze: auto
+
+title-block-banner: true
+title-block-style: default
+author: 
+  name: Kelly Sovacool
+  url: https://sovacool.dev
+date-format: iso
+embed-resources: true
+code-fold: show
+code-line-numbers: true
+code-link: true
+code-overflow: wrap
+format:
+  html:
+    theme: spacelab
+    toc: true
+    toc-depth: 5
+  revealjs: default
+
