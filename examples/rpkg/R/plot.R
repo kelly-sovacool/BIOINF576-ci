@@ -9,9 +9,10 @@
 #' @export
 #'
 plot_relabun_box <- function(dat, xcol = rel_abun, ycol = otu, colorcol = dx) {
-  return(ggplot2::ggplot(ggplot2::aes(x = {{ xcol }},
-                                      y = {{ ycol }},
-                                      color = {{ colorcol }})) +
+  return(dat %>%
+           ggplot2::ggplot(ggplot2::aes(x = {{ xcol }},
+                                        y = {{ ycol }},
+                                        color = {{ colorcol }})) +
            ggplot2::geom_boxplot() +
            ggplot2::theme_bw()
          )
