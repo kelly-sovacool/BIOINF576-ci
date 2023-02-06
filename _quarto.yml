@@ -1,5 +1,8 @@
 project:
-  title: "website"
+  title: "Bioinf User Interfaces"
+  output-dir: docs
+  render:
+    - index.qmd
 
 website:
   repo-url: https://github.com/kelly-sovacool/user-interfaces
@@ -21,7 +24,6 @@ author:
   url: https://sovacool.dev
 date-format: iso
 embed-resources: true
-code-fold: show
 code-line-numbers: true
 code-link: true
 code-overflow: wrap
@@ -30,5 +32,6 @@ format:
     theme: spacelab
     toc: true
     toc-depth: 5
-  revealjs: default
+    #code-fold: show
+  #revealjs: default
 

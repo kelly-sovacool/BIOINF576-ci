@@ -8,37 +8,73 @@ categories:
     - Snakemake
     - Bioinformatics
     - Software Development
+execute:
+    eval: false
 ---
 
-Example project: OTUs
+## Example project: OTUs
 
-```{r r-read}
-#| filename: R/summarize_counts.R
-otu_dat <- readr::read_csv('data/otu_counts.csv')
-head(otu_dat)
-```
+Researchers can characterize the composition of microbial communities by taking 
+a sample of the community, sequencing a short section of the same gene 
+(16S amplicon sequencing), and then clustering microbial DNA sequences into 
+Operational Taxonomic Units (OTUs).
+In many human gut diseases, the composition of the gut microbiome differs 
+between patients with the disease and healthy controls.
+You want to investigate whether there is a difference in human gut microbiome
+composition between patients with and without colorectal cancer, so you decide
+to make a software package to carry out this analysis.
+
+You have a large dataset that is already processed to cluster the sequences 
+into OTUs and calculate the relative abundance of each OTU in each patient sample. 
+This dataset has 500 patient samples and 7,000 OTUs. For the purposes of testing 
+and developing your package, you make a small example dataset with 20 patients
+and 10 OTUs.
+
+
+## Interfaces
 
 ### Package Interface
 
-#### The code you write
+You implement the features of your project as functions in an R or Python package.
+The user writes a script that imports your package and calls your functions to
+use it for their own dataset.
 
-```{r r-summarize_means}
-#| filename: R/summarize_counts.R
-otu_dat <- readr::read_csv('data/otu_counts.csv')
-```
+You wrote functions to convert a data frame of OTU relative abundances from
+wide to long and plot the relative abundances as a box plot.
 
-#### What the user does
+#### R package
+
+
+#### Python package
 
 ### Command Line Interface (CLI)
 
 #### Python
 
-- click, optparse, argparse...
+Packages to help implement a CLI:
+- click
+- optparse
+- argparse
+- docopt (Kelly's favorite but no longer maintained)
 
 #### R
+
+R packages typically do not include a CLI; authors usually expect you to use 
+their software from within R. However, there are options for implementing 
+a CLI in R.
+
+The simplest method is to define a function that ties together the main features
+of your package. 
+Users can run R code from the command line that calls your main function with 
+`R -e "r_code_to_execute"`.
+
+If you want to write a CLI that is similar to what you can do in Python, there
+are R packages for that. Some are not well maintained.
 
 - https://cran.r-project.org/web/packages/optparse/index.html
 
 #### Snakemake + Python and/or R
 
 ### Graphical User Interface (GUI)
+
+- R shiny
