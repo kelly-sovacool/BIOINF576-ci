@@ -2,7 +2,7 @@ library(glue)
 library(schtools)
 library(tidyverse)
 
-otu_large_raw <- read_csv("/Users/sovacool/projects/schloss-lab/mikropml/data-raw/otu_large_bin.csv")
+otu_large_raw <- read_csv("https://raw.githubusercontent.com/SchlossLab/mikropml/main/data-raw/otu_large_bin.csv")
 otu_small <- otu_large_raw %>%
   group_by(dx) %>%
   slice_head(n = 10) %>%
