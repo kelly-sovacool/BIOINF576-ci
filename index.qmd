@@ -9,8 +9,14 @@ categories:
     - Bioinformatics
     - Software Development
 execute:
-    eval: false
+    eval: true
+    echo: true
 ---
+
+```{r}
+#| echo: false
+devtools::install('examples/rpkg')
+```
 
 ## Example project: OTUs
 
@@ -30,19 +36,46 @@ This dataset has 500 patient samples and 7,000 OTUs. For the purposes of testing
 and developing your package, you make a small example dataset with 20 patients
 and 10 OTUs.
 
-
 ## Interfaces
 
 ### Package Interface
 
 You implement the features of your project as functions in an R or Python package.
 The user writes a script that imports your package and calls your functions to
-use it for their own dataset.
+use them for their own dataset.
 
-You wrote functions to convert a data frame of OTU relative abundances from
-wide to long and plot the relative abundances as a box plot.
+As an initial prototype, you write functions to convert a data frame of OTU 
+relative abundances from wide to long and plot the relative abundances as a box plot.
 
 #### R package
+
+You create an R package and implement 
+the functions `wide_to_long()` and `plot_relabun_box()`.
+The structure of the package looks something like this:
+
+```
+rpkg
+├── DESCRIPTION
+├── LICENSE
+├── LICENSE.md
+├── NAMESPACE
+└── R
+    ├── main.R
+    ├── plot.R
+    ├── reexports.R
+    └── tidy.R
+```
+
+The user can then write an R script to use the package for their own dataset:
+
+```{r}
+#| filename: analysis_script.R
+#devtools::install_github('https://github.com/yourusername/rpkg')
+library(dplyr)
+library(rpkg)
+otu_dat <- readr::read_csv('data/otu.csv')
+otu_dat %>% wide_to_long() %>% plot_relabun_box()
+```
 
 
 #### Python package
@@ -52,6 +85,7 @@ wide to long and plot the relative abundances as a box plot.
 #### Python
 
 Packages to help implement a CLI:
+
 - click
 - optparse
 - argparse
@@ -69,9 +103,10 @@ Users can run R code from the command line that calls your main function with
 `R -e "r_code_to_execute"`.
 
 If you want to write a CLI that is similar to what you can do in Python, there
-are R packages for that. Some are not well maintained.
-
-- https://cran.r-project.org/web/packages/optparse/index.html
+are R packages for that. Some are not well maintained. 
+[Optparse](https://cran.r-project.org/web/packages/optparse/index.html) is a
+CLI options parser that behaves similarly to the Python package of the same name 
+and appears to be actively maintained.
 
 #### Snakemake + Python and/or R
 
