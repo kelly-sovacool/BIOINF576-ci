@@ -1,12 +1,12 @@
 project:
-  title: "Bioinf User Interfaces"
+  title: "BIOINF 576: Continuoug Integration"
   output-dir: docs
   render:
     - index.qmd
 
 website:
-  repo-url: https://github.com/kelly-sovacool/user-interfaces
-  site-url: https://sovacool.dev/user-interfaces
+  repo-url: https://github.com/kelly-sovacool/bioinf576-ci
+  site-url: https://sovacool.dev/bioinf576-ci
   repo-actions: [edit, issue]
   twitter-card:
     creator: "@kelly_sovacool"
@@ -22,16 +22,15 @@ title-block-style: default
 author: 
   name: Kelly Sovacool
   url: https://sovacool.dev
-date-format: iso
-embed-resources: true
-code-line-numbers: true
-code-link: true
-code-overflow: wrap
 format:
   html:
     theme: spacelab
     toc: true
     toc-depth: 5
-    #code-fold: show
-  #revealjs: default
+    toc-location: left
+    date-format: iso
+    embed-resources: true
+    code-line-numbers: true
+    code-link: true
+    code-overflow: wrap
 

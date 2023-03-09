@@ -1,5 +1,5 @@
 ---
-title: "Developing Bioinformatics Software: Continuous Integration & Gitflow"
+title: "Developing Bioinformatics Software: Continuous Integration"
 author: Kelly Sovacool
 date: last-modified
 categories:
@@ -12,17 +12,31 @@ execute:
     echo: true
 ---
 
-
 :::: {.columns}
-::: {.left}
+
+::: {.column}
+
+R pkg
+```yaml
+name: build
+```
+
 :::
-::: {.right}
+
+::: {.column}
+
+Python pkg
+```yaml
+name: build
+```
+
 :::
+
 ::::
 
-# git flow
+# Typical git workflow
 
-Git flow is a model for using issues, branches, and pull requests for software maintenance.
+[Trunk-based development](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development)
 
 1. An issue is opened
     - a developer or user notices a bug, requests a feature, or asks a question.
@@ -33,7 +47,8 @@ Git flow is a model for using issues, branches, and pull requests for software m
     1. write tests that will pass when the issue is resolved.
     1. write or edit code to resolve the issue.
     1. (possibly) write more tests to make sure edge cases and failure modes are handled.
-    1. make sure your tests pass.
+    1. write/update documentation if needed.
+    1. make sure your tests pass and the package still builds.
 1. Create a pull request
     1. assign or request a reviewer.
     1. the reviewer reviews your code.
@@ -42,17 +57,18 @@ Git flow is a model for using issues, branches, and pull requests for software m
     1. merge the pull request.
 1. Celebrate that you resolved an issue!
 
-# continuous integration + git flow = magic
+# Continuous integration + git = magic
 
 You don't have to remember to check that your package works, lint your code, 
 update the documentation website: let the machines do it for you automatically!
 
-Continuous integration is
+Continuous integration is a practice where tests and other code quality checks 
+are automatically run before code is merged into the main branch.
 
-How does this modify our git flow? The CI service will make sure the package 
+How does this modify our git workflow? The CI service will make sure the package 
 builds, run our tests, etc. when we open the pull request, so we don't have to!
 
-## ci service options
+### CI service options
 
 - GitHub Actions
 - Travis
@@ -60,20 +76,36 @@ builds, run our tests, etc. when we open the pull request, so we don't have to!
 - CircleCI
 - Azure DevOps
 
-## anatomy of a github actions workflow
+# building a CI workflow with GitHub Actions
 
-## useful components of continuous integration
+We're going to create a CI workflow that runs on pull requests to the main branch
 
-### build
+### anatomy of a github actions workflow
 
-### test
+## build
 
-### document
+- R: devtools::install & check
+- Python: python3 -m build
+
+## test
+
+- R: testthat
+- Python: pytest
+
+## code coverage
+
+codecov is free for open source projects
+
+## lint or style code
+
+- R: styler
+- Python: black
+
+## document
 
 - R: roxygen2
 - Python: sphinx
 
-### lint or style code
+### setup a documentation website
 
-- R: styler
-- Python: black
+GitHub Pages will host your docs for free!
