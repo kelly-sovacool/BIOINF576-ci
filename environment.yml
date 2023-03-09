@@ -1,0 +1,13 @@
+name: bf576
+channels:
+- conda-forge
+- r
+dependencies:
+- jupyter
+- python=3.11
+- quarto
+- r-base=4
+- r-dplyr
+- r-ggplot2
+- r-readr
+- r-tidyr

@@ -1,11 +1,10 @@
 ---
-title: "User Interfaces for Bioinformatics Software"
+title: "Developing Bioinformatics Software: Continuous Integration & Gitflow"
 author: Kelly Sovacool
 date: last-modified
 categories:
     - R
     - Python
-    - Snakemake
     - Bioinformatics
     - Software Development
 execute:
@@ -13,103 +12,68 @@ execute:
     echo: true
 ---
 
-```{r}
-#| echo: false
-devtools::install('examples/rpkg')
-```
 
-## Example project: OTUs
+:::: {.columns}
+::: {.left}
+:::
+::: {.right}
+:::
+::::
 
-Researchers can characterize the composition of microbial communities by taking 
-a sample of the community, sequencing a short section of the same gene 
-(16S amplicon sequencing), and then clustering microbial DNA sequences into 
-Operational Taxonomic Units (OTUs).
-In many human gut diseases, the composition of the gut microbiome differs 
-between patients with the disease and healthy controls.
-You want to investigate whether there is a difference in human gut microbiome
-composition between patients with and without colorectal cancer, so you decide
-to make a software package to carry out this analysis.
+# git flow
 
-You have a large dataset that is already processed to cluster the sequences 
-into OTUs and calculate the relative abundance of each OTU in each patient sample. 
-This dataset has 500 patient samples and 7,000 OTUs. For the purposes of testing 
-and developing your package, you make a small example dataset with 20 patients
-and 10 OTUs.
+Git flow is a model for using issues, branches, and pull requests for software maintenance.
 
-## Interfaces
+1. An issue is opened
+    - a developer or user notices a bug, requests a feature, or asks a question.
+1. Engage in the issue comments
+    - to clarify the issue, ask for a reproducible example, etc.
+1. Work on the issue
+    1. create a new branch and switch to it.
+    1. write tests that will pass when the issue is resolved.
+    1. write or edit code to resolve the issue.
+    1. (possibly) write more tests to make sure edge cases and failure modes are handled.
+    1. make sure your tests pass.
+1. Create a pull request
+    1. assign or request a reviewer.
+    1. the reviewer reviews your code.
+    1. you make any requested changes.
+    1. the reviewer approves your pull request once they're happy with it.
+    1. merge the pull request.
+1. Celebrate that you resolved an issue!
 
-### Package Interface
+# continuous integration + git flow = magic
 
-You implement the features of your project as functions in an R or Python package.
-The user writes a script that imports your package and calls your functions to
-use them for their own dataset.
+You don't have to remember to check that your package works, lint your code, 
+update the documentation website: let the machines do it for you automatically!
 
-As an initial prototype, you write functions to convert a data frame of OTU 
-relative abundances from wide to long and plot the relative abundances as a box plot.
+Continuous integration is
 
-#### R package
+How does this modify our git flow? The CI service will make sure the package 
+builds, run our tests, etc. when we open the pull request, so we don't have to!
 
-You create an R package and implement 
-the functions `wide_to_long()` and `plot_relabun_box()`.
-The structure of the package looks something like this:
+## ci service options
 
-```
-rpkg
-├── DESCRIPTION
-├── LICENSE
-├── LICENSE.md
-├── NAMESPACE
-└── R
-    ├── main.R
-    ├── plot.R
-    ├── reexports.R
-    └── tidy.R
-```
+- GitHub Actions
+- Travis
+- Jenkins
+- CircleCI
+- Azure DevOps
 
-The user can then write an R script to use the package for their own dataset:
+## anatomy of a github actions workflow
 
-```{r}
-#| filename: analysis_script.R
-#devtools::install_github('https://github.com/yourusername/rpkg')
-library(dplyr)
-library(rpkg)
-otu_dat <- readr::read_csv('data/otu.csv')
-otu_dat %>% wide_to_long() %>% plot_relabun_box()
-```
+## useful components of continuous integration
 
+### build
 
-#### Python package
+### test
 
-### Command Line Interface (CLI)
+### document
 
-#### Python
+- R: roxygen2
+- Python: sphinx
 
-Packages to help implement a CLI:
+### lint or style code
 
-- click
-- optparse
-- argparse
-- docopt (Kelly's favorite but no longer maintained)
-
-#### R
-
-R packages typically do not include a CLI; authors usually expect you to use 
-their software from within R. However, there are options for implementing 
-a CLI in R.
-
-The simplest method is to define a function that ties together the main features
-of your package. 
-Users can run R code from the command line that calls your main function with 
-`R -e "r_code_to_execute"`.
-
-If you want to write a CLI that is similar to what you can do in Python, there
-are R packages for that. Some are not well maintained. 
-[Optparse](https://cran.r-project.org/web/packages/optparse/index.html) is a
-CLI options parser that behaves similarly to the Python package of the same name 
-and appears to be actively maintained.
-
-#### Snakemake + Python and/or R
-
-### Graphical User Interface (GUI)
-
-- R shiny
+- R: styler
+- Python: black
