@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Developing Bioinformatics Software: Continuous Integration",
+    "section": "",
+    "text": "R pkg\nname: build\n\nPython pkg\nname: build"
+  },
+  {
+    "objectID": "index.html#build",
+    "href": "index.html#build",
+    "title": "Developing Bioinformatics Software: Continuous Integration",
+    "section": "build",
+    "text": "build\n\nR: devtools::install & check\nPython: python3 -m build"
+  },
+  {
+    "objectID": "index.html#test",
+    "href": "index.html#test",
+    "title": "Developing Bioinformatics Software: Continuous Integration",
+    "section": "test",
+    "text": "test\n\nR: testthat\nPython: pytest"
+  },
+  {
+    "objectID": "index.html#code-coverage",
+    "href": "index.html#code-coverage",
+    "title": "Developing Bioinformatics Software: Continuous Integration",
+    "section": "code coverage",
+    "text": "code coverage\ncodecov is free for open source projects"
+  },
+  {
+    "objectID": "index.html#lint-or-style-code",
+    "href": "index.html#lint-or-style-code",
+    "title": "Developing Bioinformatics Software: Continuous Integration",
+    "section": "lint or style code",
+    "text": "lint or style code\n\nR: styler\nPython: black"
+  },
+  {
+    "objectID": "index.html#document",
+    "href": "index.html#document",
+    "title": "Developing Bioinformatics Software: Continuous Integration",
+    "section": "document",
+    "text": "document\n\nR: roxygen2\nPython: sphinx\n\n\nsetup a documentation website\nGitHub Pages will host your docs for free!"
+  },
+  {
+    "objectID": "index.html#other-ways-to-trigger-workflows",
+    "href": "index.html#other-ways-to-trigger-workflows",
+    "title": "Developing Bioinformatics Software: Continuous Integration",
+    "section": "other ways to trigger workflows",
+    "text": "other ways to trigger workflows"
+  }
+]

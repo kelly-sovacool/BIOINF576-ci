@@ -1,5 +1,6 @@
 project:
-  title: "BIOINF 576: Continuoug Integration"
+  title: "BIOINF 576"
+  type: website
   output-dir: docs
   render:
     - index.qmd
@@ -12,7 +13,11 @@ website:
     creator: "@kelly_sovacool"
   open-graph: true
   navbar:
+    background: primary
     search: true
+    right:
+      - icon: github
+        url: https://github.com/kelly-sovacool/bioinf576-ci
 
 execute:
   freeze: auto

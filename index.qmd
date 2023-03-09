@@ -109,3 +109,5 @@ codecov is free for open source projects
 ### setup a documentation website
 
 GitHub Pages will host your docs for free!
+
+## other ways to trigger workflows
