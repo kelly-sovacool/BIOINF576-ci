@@ -8,16 +8,18 @@ categories:
     - Bioinformatics
     - Software Development
 execute:
-    eval: true
+    eval: false
     echo: true
+engine: knitr
 ---
-
+<!--
 :::: {.columns}
 
 ::: {.column}
 
 R pkg
-```yaml
+```{yaml}
+#| filename: R ci.yml
 name: build
 ```
 
@@ -26,17 +28,23 @@ name: build
 ::: {.column}
 
 Python pkg
-```yaml
+```{yaml}
+#| filename: Py ci.yml
 name: build
 ```
 
 :::
 
 ::::
+-->
+# A typical git workflow
 
-# Typical git workflow
-
-[Trunk-based development](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development)
+The current best practice for using git to manage collaborative software
+projects is known as 
+[trunk-based development](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development).
+Under this model, small changes are frequently made in different branches, then
+merged into the main "trunk" (i.e. the main or master branch) of the repo after
+passing peer review. The steps look like this:
 
 1. An issue is opened
     - a developer or user notices a bug, requests a feature, or asks a question.
@@ -57,10 +65,18 @@ name: build
     1. merge the pull request.
 1. Celebrate that you resolved an issue!
 
+You can have multiple issues open at any stage of the process at a time. 
+You might start working on a feature, switch to fixing a time-sensitive bug and 
+resolve it, then later go back to working on that feature.
+Meanwhile, collaborators are working on other issues too!
+This process enables highly collaborative and asynchronous work.
+
 # Continuous integration + git = magic
 
-You don't have to remember to check that your package works, lint your code, 
-update the documentation website: let the machines do it for you automatically!
+It would be a bummer if you or a collaborator forgot a crucial step of the 
+process, like running the unit tests or linting your code, and accidentally 
+merge buggy/broken/bad code into the main branch of your project.
+The good news is: You don't have to! Let the machines do it for you automatically!
 
 Continuous integration is a practice where tests and other code quality checks 
 are automatically run before code is merged into the main branch.
@@ -76,38 +92,251 @@ builds, run our tests, etc. when we open the pull request, so we don't have to!
 - CircleCI
 - Azure DevOps
 
-# building a CI workflow with GitHub Actions
+We'll use GitHub Actions because it's easy to setup when you already have your repo on GitHub.
 
-We're going to create a CI workflow that runs on pull requests to the main branch
+# Building a CI workflow with GitHub Actions
 
-### anatomy of a github actions workflow
+We're going to create a CI workflow that runs on all pushes and pull requests to
+ the default branch (typically "main" or "master").
+Workflows are defined with YAML files to specify how to configure the machine 
+that runs the workflow, install dependencies, and run commands.
 
-## build
+Let's start by creating a small workflow that prints "Hello, world!" and lists 
+the files in the package.
 
-- R: devtools::install & check
-- Python: python3 -m build
+I will demonstrate with two example packages: [bionitio-r](https://github.com/kelly-sovacool/bionitio-r) and [bionitio-python](https://github.com/kelly-sovacool/bionitio-python).
 
-## test
+## Getting started with a simple action
 
-- R: testthat
-- Python: pytest
+Every Actions workflow resides in `.github/workflows/` and needs:
 
-## code coverage
+- `on` -- events that trigger the workflow
+- `jobs` -- list of independent jobs each with `steps` to run in sequence.
 
-codecov is free for open source projects
+```{yaml}
+#| filename: .github/workflows/greet.yml
 
-## lint or style code
+# name of the workflow
+name: greet 
 
-- R: styler
-- Python: black
+# when the workflow should run
+on: 
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches: 
+      - main
+      - master
 
-## document
+# independent jobs in the workflow
+jobs: 
+  # this workflow just has one job called "greet"
+  greet: 
+    # the operating system to use for this workflow
+    runs-on: ubuntu-latest 
+    # list of steps in the workflow
+    steps: 
+      # use an action provided by github to checkout the repo
+      - uses: actions/checkout@v3 
+      
+      # a custom step that runs a couple shell commands
+      - name: List 
+        run: |
+            echo "listing files in the bioinitio directory"
+            ls bionitio
+      
+      # a custom step that runs R code
+      - name: Greet 
+        run: print("Hello, world!")
+        # Replace `shell: Rscript {0}` with `shell: python {0}` to run Python code instead!
+        shell: Rscript {0}  
+
+
+```
+
+::: {.callout-tip}
+## "Hello world" action
+
+Add this file to your project repo, 
+replace `bionitio` with the name of your package,
+then commit and push it to GitHub.
+:::
+
+On GitHub, go to the Actions tab of your repo. 
+**Is the workflow running?**
+
+Once the workflow finishes, it will either have a green checkmark (✅ success) 
+or a red x (❌ failure).
+
+![](img/actions-greet.png)
+
+**Click on the workflow run.** Then under 'jobs', **click on the job 'greet'.**
+You're now viewing the log file for the job. 
+You can click on the arrows to expand the details for each step.
+
+![](img/actions-greet-job-log.png)
+
+
+::: {.callout-tip}
+# `greet.yml` status
+
+In Slack, react with ✅ or ❌ to indicate the status of your workflow.
+:::
+
+## Test suite
+
+This initial "hello world" workflow is cute, but not very useful. 
+Let's edit the workflow to run our test suite for us automatically!
+
+**R**: use `devtools::test()` to run just the tests, 
+or `devtools::check()` to run all checks for CRAN.
+
+```{yaml}
+#| filename: R .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches: 
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+          working-directory: bionitio
+      - name: Check
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--no-manual", "--as-cran")'
+          working-directory: bionitio
+
+```
+
+::: {.callout-note}
+The r-lib actions assume that the top level of your repo is the same as the top 
+level of your R package. If that's not the case, you'll need to specify the
+`working-directory`
+:::
+
+**Python**: use `pytest` to run the test suite.
+
+```{yaml}
+#| filename: Py .github/workflows/ci.yml
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then 
+            pip install -r requirements.txt
+        fi
+    - name: Test with pytest
+      run: |
+        pytest .
+```
+
+
+In each of these workflows, the action checks out the repo, installs R or Python, 
+installs the dependencies of the package, then runs the tests.
+If any of your tests fail, the whole actions workflow will fail too.
+
+::: {.callout-tip}
+## Testing with CI
+
+Modify your CI workflow to run the test suite and push it. 
+Does the CI workflow succeed or fail?
+
+You may get failures if you haven't been running your unit tests as you develop
+your code base. Take a few minutes to open issues for each test that failed.
+:::
+
+### Workflow status badges
+
+Each Actions workflow has a status badge that indicates whether the action is
+passing or failing. 
+You may have come across status badges in GitHub README files of packages you use. 
+Putting a CI status badge in the README file is a popular way for project 
+maintainers to prominently display that CI is set up and it's working!
+
+::: {.callout-tip}
+### Add the workflow status badge to your README
+
+Under the Actions tab, click the name of the workflow (e.g. `ci`), click the 
+triple dots menu (`...`) in the upper right corner, and select `Create status badge`.
+
+In the pop-up menu, click `Copy status badge Markdown`, paste it into your
+README.md file, then commit and push your change.
+
+React to the slack message when you're finished.
+:::
+
+![](img/create-status-badge.png)
+
+![](img/copy-status-badge-md.png)
+
+### Code coverage
+
+codecov is free for open source projects!
+
+#### codecov status badge
+
+## Lint and style code
+
+- R: lintr & styler
+- Python: flake8 & black
+
+## Document
 
 - R: roxygen2
 - Python: sphinx
 
-### setup a documentation website
+### Setup a documentation website
 
 GitHub Pages will host your docs for free!
 
-## other ways to trigger workflows
+## Other ways to trigger workflows
+
+# Branch protection
+
+# Improving our tests
+
+## Fail Fast Principle
