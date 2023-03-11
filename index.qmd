@@ -46,6 +46,7 @@ Under this model, small changes are frequently made in different branches, then
 merged into the main "trunk" (i.e. the main or master branch) of the repo after
 passing peer review. The steps look like this:
 
+::: {.callout}
 1. An issue is opened
     - a developer or user notices a bug, requests a feature, or asks a question.
 1. Engage in the issue comments
@@ -64,6 +65,7 @@ passing peer review. The steps look like this:
     1. the reviewer approves your pull request once they're happy with it.
     1. merge the pull request.
 1. Celebrate that you resolved an issue!
+:::
 
 You can have multiple issues open at any stage of the process at a time. 
 You might start working on a feature, switch to fixing a time-sensitive bug and 
@@ -75,15 +77,17 @@ This process enables highly collaborative and asynchronous work.
 
 It would be a bummer if you or a collaborator forgot a crucial step of the 
 process, like running the unit tests or linting your code, and accidentally 
-merge buggy/broken/bad code into the main branch of your project.
-The good news is: You don't have to! Let the machines do it for you automatically!
+merged buggy/broken/bad code into the main branch of your project.
+The good news is: You don't have to remember everything! Let the machines do it for you automatically!
 
-Continuous integration is a practice where tests and other code quality checks 
-are automatically run before code is merged into the main branch.
+**Continuous integration** is a practice where tests and other code quality checks 
+are automatically run before code changes are merged into the main branch.
 
-How does this modify our git workflow? The CI service will make sure the package 
-builds, run our tests, etc. when we open the pull request, so we don't have to!
+How does this modify our git workflow? When we open a pull request or push a 
+commit to main, the CI service will run a workflow we define to run our checks,
+so we don't have to do it manually!
 
+::: {.callout}
 ### CI service options
 
 - GitHub Actions
@@ -91,8 +95,10 @@ builds, run our tests, etc. when we open the pull request, so we don't have to!
 - Jenkins
 - CircleCI
 - Azure DevOps
+:::
 
-We'll use GitHub Actions because it's easy to setup when you already have your repo on GitHub.
+We'll use GitHub Actions because it's easy to setup when you already have your 
+repo hosted on GitHub, and they provide a lot of computing resources for free.
 
 # Building a CI workflow with GitHub Actions
 
@@ -180,7 +186,7 @@ You can click on the arrows to expand the details for each step.
 
 
 ::: {.callout-tip}
-# `greet.yml` status
+# `greet` status
 
 In Slack, react with ✅ or ❌ to indicate the status of your workflow.
 :::
@@ -234,7 +240,26 @@ jobs:
 ::: {.callout-note}
 The r-lib actions assume that the top level of your repo is the same as the top 
 level of your R package. If that's not the case, you'll need to specify the
-`working-directory`
+`working-directory`. 
+
+For my example project, `bionitio-r` is the top level of the git repo, and from
+there the R package resides in `bionitio`:
+```
+bionitio-r
+├── README.md
+├── .github
+│   └── workflows
+│       └── ci.yml
+├── bionitio
+│   ├── DESCRIPTION
+│   ├── R
+│   │   ├── bionitio.R
+│   │   └── file_utils.R
+│   └── tests
+│       ├── testthat
+│       │   └── test-stats.R
+│       └── testthat.R
+```
 :::
 
 **Python**: use `pytest` to run the test suite.
@@ -306,7 +331,7 @@ triple dots menu (`...`) in the upper right corner, and select `Create status ba
 In the pop-up menu, click `Copy status badge Markdown`, paste it into your
 README.md file, then commit and push your change.
 
-React to the slack message when you're finished.
+React to the slack message with ✅ when you're finished.
 :::
 
 ![](img/create-status-badge.png)
@@ -333,10 +358,13 @@ codecov is free for open source projects!
 
 GitHub Pages will host your docs for free!
 
-## Other ways to trigger workflows
+# Related topics & resources to explore
 
-# Branch protection
-
-# Improving our tests
-
-## Fail Fast Principle
+- Other ways to trigger workflows
+    - on release
+    - manual dispatch
+    - cron schedule
+- branch protection
+    - prevent bad PRs from getting merged
+- pre-commit hooks
+    - run checks, style code, etc before you even commit
