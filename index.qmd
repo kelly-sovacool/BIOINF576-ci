@@ -163,18 +163,22 @@ jobs:
 ```
 
 ::: {.callout-tip}
-## "Hello world" action
+## Create the "Hello world" action
 
-Add this file to your project repo, 
-replace `bionitio` with the name of your package,
-then commit and push it to GitHub.
+1. Open an issue with the title "Set up continuous integration".
+1. Switch to a new branch called `ci`.
+1. Add this file to your repo at `.github/workflows/greet.yml`.
+1. Replace `bionitio` with the name of your package.
+1. Commit and push it to GitHub.
+1. Finally, open a pull request from your new branch into main.
 :::
 
+Did your workflow run?
 On GitHub, go to the Actions tab of your repo. 
-**Is the workflow running?**
+Opening the pull request should have triggered the workflow to run.
 
-Once the workflow finishes, it will either have a green checkmark (✅ success) 
-or a red x (❌ failure).
+Once the workflow finishes (about 15 seconds), it will either have a green 
+checkmark (✅) for success or a red X (❌) for failure.
 
 ![](img/actions-greet.png)
 
@@ -184,12 +188,14 @@ You can click on the arrows to expand the details for each step.
 
 ![](img/actions-greet-job-log.png)
 
+You can also see the status of the action from the Pull Request summary page.
 
 ::: {.callout-tip}
 # `greet` status
 
 In Slack, react with ✅ or ❌ to indicate the status of your workflow.
 :::
+
 
 ## Test suite
 
@@ -323,6 +329,7 @@ Putting a CI status badge in the README file is a popular way for project
 maintainers to prominently display that CI is set up and it's working!
 
 ::: {.callout-tip}
+
 ### Add the workflow status badge to your README
 
 Under the Actions tab, click the name of the workflow (e.g. `ci`), click the 
@@ -331,12 +338,16 @@ triple dots menu (`...`) in the upper right corner, and select `Create status ba
 In the pop-up menu, click `Copy status badge Markdown`, paste it into your
 README.md file, then commit and push your change.
 
-React to the slack message with ✅ when you're finished.
+**React to the slack message with ✅ when you're finished.**
+
 :::
 
 ![](img/create-status-badge.png)
 
-![](img/copy-status-badge-md.png)
+![](img/copy-status-badge-md.png){width=50%}
+
+Now anyone who takes a look at your README file will see that your project uses
+continuous integration!
 
 ### Code coverage
 
