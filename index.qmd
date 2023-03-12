@@ -11,6 +11,9 @@ execute:
     eval: false
     echo: true
 engine: knitr
+crossref:
+    lst-title: Workflow
+    lst-prefix: Workflow
 ---
 <!--
 :::: {.columns}
@@ -73,7 +76,9 @@ resolve it, then later go back to working on that feature.
 Meanwhile, collaborators are working on other issues too!
 This process enables highly collaborative and asynchronous work.
 
-# Continuous integration + git = magic
+## Continuous integration: what & why?
+
+> git + ci = magic ✨
 
 It would be a bummer if you or a collaborator forgot a crucial step of the 
 process, like running the unit tests or linting your code, and accidentally 
@@ -112,16 +117,39 @@ the files in the package.
 
 I will demonstrate with two example packages: [bionitio-r](https://github.com/kelly-sovacool/bionitio-r) and [bionitio-python](https://github.com/kelly-sovacool/bionitio-python).
 
+## Configure Actions permissions
+
+Before we can get started using GitHub Actions, we'll need to make sure we 
+configure our repo settings to allow Actions to run and push changes.
+
+:::{.callout-tip}
+# Enable Actions
+On Github.com, go to your repository, click `Settings` and under 'Code and automation'
+click `Actions` -> `General`.
+Under 'Actions permissions', select `Allow all actions and reusable workflows`
+and click `Save`.
+:::
+
+![](img/actions-permissions.png)
+
+:::{.callout-tip}
+# Allow Actions to read & write
+Next, scroll down to the bottom of the page. Under 'Workflow permissions', select
+`Read and write permissions` and click `Save`.
+:::
+
+![](img/workflow-permissions.png)
+
+Now we're ready to start using GitHub Actions for our projects!
+
 ## Getting started with a simple action
 
-Every Actions workflow resides in `.github/workflows/` and needs:
+Every GitHub Actions workflow resides in `.github/workflows/` and needs:
 
 - `on` -- events that trigger the workflow
 - `jobs` -- list of independent jobs each with `steps` to run in sequence.
 
-```{yaml}
-#| filename: .github/workflows/greet.yml
-
+```{#lst-greet .yaml lst-cap="`.github/workflows/greet.yml`"}
 # name of the workflow
 name: greet 
 
@@ -158,19 +186,19 @@ jobs:
         run: print("Hello, world!")
         # Replace `shell: Rscript {0}` with `shell: python {0}` to run Python code instead!
         shell: Rscript {0}  
-
-
 ```
 
 ::: {.callout-tip}
+
 ## Create the "Hello world" action
 
 1. Open an issue with the title "Set up continuous integration".
 1. Switch to a new branch called `ci`.
-1. Add this file to your repo at `.github/workflows/greet.yml`.
+1. Add the workflow (@lst-greet) to your repo at `.github/workflows/greet.yml`.
 1. Replace `bionitio` with the name of your package.
 1. Commit and push it to GitHub.
 1. Finally, open a pull request from your new branch into main.
+
 :::
 
 Did your workflow run?
@@ -205,8 +233,7 @@ Let's edit the workflow to run our test suite for us automatically!
 **R**: use `devtools::test()` to run just the tests, 
 or `devtools::check()` to run all checks for CRAN.
 
-```{yaml}
-#| filename: R .github/workflows/ci.yml
+```{#lst-cir .yaml lst.cap="R `.github/workflows/ci.yml`"}
 name: CI
 
 on:
@@ -240,7 +267,6 @@ jobs:
         with:
           args: 'c("--no-manual", "--as-cran")'
           working-directory: bionitio
-
 ```
 
 ::: {.callout-note}
@@ -270,8 +296,7 @@ bionitio-r
 
 **Python**: use `pytest` to run the test suite.
 
-```{yaml}
-#| filename: Py .github/workflows/ci.yml
+```{#lst-cipy .yaml lst.cap="Py `.github/workflows/ci.yml`"}
 name: ci
 
 on:
@@ -296,7 +321,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install pytest
         if [ -f requirements.txt ]; then 
             pip install -r requirements.txt
         fi
@@ -313,11 +338,16 @@ If any of your tests fail, the whole actions workflow will fail too.
 ::: {.callout-tip}
 ## Testing with CI
 
-Modify your CI workflow to run the test suite and push it. 
+In your `ci` branch, modify your CI workflow to run the test suite 
+(R: @lst-cir, Python: @lst-cipy),
+then commit and push your changes.
 Does the CI workflow succeed or fail?
 
 You may get failures if you haven't been running your unit tests as you develop
 your code base. Take a few minutes to open issues for each test that failed.
+
+**React to the slack message with ✅ when you're finished opening issues**
+or now if the workflow completed successfully.
 :::
 
 ### Workflow status badges
@@ -329,17 +359,15 @@ Putting a CI status badge in the README file is a popular way for project
 maintainers to prominently display that CI is set up and it's working!
 
 ::: {.callout-tip}
-
 ### Add the workflow status badge to your README
 
 Under the Actions tab, click the name of the workflow (e.g. `ci`), click the 
 triple dots menu (`...`) in the upper right corner, and select `Create status badge`.
 
 In the pop-up menu, click `Copy status badge Markdown`, paste it into your
-README.md file, then commit and push your change.
+README.md file, then commit and push your change on the `ci` branch.
 
 **React to the slack message with ✅ when you're finished.**
-
 :::
 
 ![](img/create-status-badge.png)
@@ -349,16 +377,166 @@ README.md file, then commit and push your change.
 Now anyone who takes a look at your README file will see that your project uses
 continuous integration!
 
-### Code coverage
-
-codecov is free for open source projects!
-
-#### codecov status badge
-
 ## Lint and style code
 
-- R: lintr & styler
-- Python: flake8 & black
+Many large software projects follow a specific coding style guide to make sure 
+their code base is consistent and easy to read.
+
+> Good coding style is like correct punctuation: you can manage without it, 
+> butitsuremakesthingseasiertoread.
+>
+> – [The Tidyverse Style Guide](https://style.tidyverse.org/index.html)
+
+A linter checks your code to make sure you conform to a style guide and raises 
+warnings if your code doesn't conform.
+A code formatter or styler modifies your code to make it conform to a style guide.
+There is a lot of overlap in the problems that linters and formatters can catch,
+but linters additionally warn about not only style problems but more serious
+problems like syntax errors.
+
+| language | linter | formatter |
+|----------|--------|-----------|
+| R        | [linter](https://lintr.r-lib.org/) | [styler](https://styler.r-lib.org/)    |
+| Python   | [flake8](https://flake8.pycqa.org/en/latest/) | [black](https://black.readthedocs.io/en/stable/#)     |
+
+When adding these tools to CI, make sure you run the formatter _before_ the 
+linter, so the linter will only complain about problems that the formatter can't
+fix.
+Since the code formatter modifies our code, we will also need to commit and push
+the code changes using the GitHub Actions bot as the author.
+
+```{#lst-r-style .yaml lst.cap="R `.github/workflows/ci.yml`"}
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:    # configure environment variables for git commits
+  actor: "41898282+github-actions[bot]"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:  # also install styler & lintr
+          extra-packages: any::rcmdcheck, any::styler, any::lintr
+          needs: check
+          working-directory: bionitio
+      - name: Configure git # use the environment variable we set above
+        run: |
+          git config --local user.email "${actor}@users.noreply.github.com"
+          git config --local user.name "$actor"
+      - name: Check
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--no-manual", "--as-cran")'
+          working-directory: bionitio
+      - name: Style & lint
+        run: |
+            styler::style_dir(".")
+            lintr::lint_dir(".")
+        shell: Rscript {0}
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "🎨 Style code" || echo "No changes to commit"
+          git push
+```
+
+```{#lst-py-style .yaml lst.cap="Py `.github/workflows/ci.yml`"}
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:    # configure environment variables for git commits
+  actor: "41898282+github-actions[bot]"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest black flake8 # also install black & flake8
+        if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+        fi
+    - name: Configure git  # use the environment variable we set above
+      run: |
+        git config --local user.email "${actor}@users.noreply.github.com"
+        git config --local user.name "$actor"
+    - name: Test
+      run: |
+        pytest .
+    - name: Format & tint
+      run: |
+        black . # first run black, then run flake8
+        flake8 --extend-ignore E203 --max-line-length 88 .
+    - name: Commit and push changes
+      run: |
+        git add .
+        git commit -m "🎨 Style code" || echo "No changes to commit"
+        git push
+```
+
+::: {.callout-note}
+flake8 is not 100% compatible with black by default. 
+Here we direct flake8 to ignore one of its errors (`--extend-ignore E203`) and
+increase the maximum allowed line length (`--max-line-length 88`) to [make flake8
+compatible with black](https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8).
+:::
+
+There are several key changes we made to this workflow to make sure our styling
+and linting would work:
+
+1. Set a global environment variable called `actor` with the username of the
+   GitHub Actions bot.
+1. Configure the git username and email to point to the GitHub Actions bot, 
+   using the environment variable we created in above.
+1. Install additional dependencies for linting and formatting the code.
+1. Run the code formatter and linter.
+1. Commit any changes and push to origin.
+
+:::{.callout-tip}
+# Style & lint your code
+
+You know the drill! Modify your workflow (R: @lst-r-style | Python: @lst-py-style)
+and see what happens when you push it to GitHub.
+
+Does the linter raise any errors?
+If so, take a moment to open issues for the errors you need to fix.
+**React to the slack message with ✅ when you're finished opening issues or now
+if you're code is already lint-free.**
+:::
 
 ## Document
 
@@ -369,13 +547,20 @@ codecov is free for open source projects!
 
 GitHub Pages will host your docs for free!
 
+## Code coverage
+
+codecov is free for open source projects!
+
+### codecov status badge
+
 # Related topics & resources to explore
 
 - Other ways to trigger workflows
-    - on release
-    - manual dispatch
-    - cron schedule
-- branch protection
-    - prevent bad PRs from getting merged
-- pre-commit hooks
-    - run checks, style code, etc before you even commit
+    - On release
+    - Manual dispatch
+    - Cron schedule
+- Branch protection
+    - Prevent PRs from getting merged until checks pass.
+- Pre-commit hooks
+    - Run checks, style code, etc before you even commit
+- More actions created by Posit: https://github.com/r-lib/actions
