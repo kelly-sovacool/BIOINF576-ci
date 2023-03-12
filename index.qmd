@@ -148,6 +148,8 @@ Every GitHub Actions workflow resides in `.github/workflows/` and needs:
 
 - `on` -- events that trigger the workflow
 - `jobs` -- list of independent jobs each with `steps` to run in sequence.
+- `steps` -- each step specifies a third party action to uses with `uses`, 
+  or specifies shell code to `run`.
 
 ```{#lst-greet .yaml lst-cap="`.github/workflows/greet.yml`"}
 # name of the workflow
@@ -233,7 +235,8 @@ Let's edit the workflow to run our test suite for us automatically!
 **R**: use `devtools::test()` to run just the tests, 
 or `devtools::check()` to run all checks for CRAN.
 
-```{#lst-cir .yaml lst.cap="R `.github/workflows/ci.yml`"}
+```{yaml}
+#| filename: "test R .github/workflows/ci.ym`"
 name: CI
 
 on:
@@ -242,7 +245,7 @@ on:
       - main
       - master
   pull_request:
-    branches: 
+    branches:
       - main
       - master
 
@@ -296,8 +299,9 @@ bionitio-r
 
 **Python**: use `pytest` to run the test suite.
 
-```{#lst-cipy .yaml lst.cap="Py `.github/workflows/ci.yml`"}
-name: ci
+```{yaml}
+#| filename: "test Py .github/workflows/ci.yml"
+name: CI
 
 on:
   push:
@@ -338,8 +342,7 @@ If any of your tests fail, the whole actions workflow will fail too.
 ::: {.callout-tip}
 ## Testing with CI
 
-In your `ci` branch, modify your CI workflow to run the test suite 
-(R: @lst-cir, Python: @lst-cipy),
+In your `ci` branch, modify your CI workflow to run the test suite,
 then commit and push your changes.
 Does the CI workflow succeed or fail?
 
@@ -377,6 +380,8 @@ README.md file, then commit and push your change on the `ci` branch.
 Now anyone who takes a look at your README file will see that your project uses
 continuous integration!
 
+![](img/badge-ci.png){width=80%}
+
 ## Lint and style code
 
 Many large software projects follow a specific coding style guide to make sure 
@@ -405,7 +410,8 @@ fix.
 Since the code formatter modifies our code, we will also need to commit and push
 the code changes using the GitHub Actions bot as the author.
 
-```{#lst-r-style .yaml lst.cap="R `.github/workflows/ci.yml`"}
+```{yaml}
+#| filename: "style R .github/workflows/ci.yml"
 name: CI
 
 on:
@@ -458,8 +464,24 @@ jobs:
           git push
 ```
 
-```{#lst-py-style .yaml lst.cap="Py `.github/workflows/ci.yml`"}
-name: ci
+
+::: {.callout-note}
+The `check-r-package` action creates files in `/package/check/`. We don't want
+git to track them, so we need to add the check dir to the gitignore file:
+
+```{text}
+#| filename: "R .gitignore"
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+check/
+```
+:::
+
+```{yaml}
+#| filename: "style Py .github/workflows/ci.yml"
+name: CI
 
 on:
   push:
@@ -497,7 +519,7 @@ jobs:
     - name: Test
       run: |
         pytest .
-    - name: Format & tint
+    - name: Format & lint
       run: |
         black . # first run black, then run flake8
         flake8 --extend-ignore E203 --max-line-length 88 .
@@ -526,16 +548,227 @@ and linting would work:
 1. Run the code formatter and linter.
 1. Commit any changes and push to origin.
 
-:::{.callout-tip}
+::::{.callout-tip}
 # Style & lint your code
 
-You know the drill! Modify your workflow (R: @lst-r-style | Python: @lst-py-style)
+You know the drill! Modify your workflow to style and lint your code,
 and see what happens when you push it to GitHub.
 
 Does the linter raise any errors?
 If so, take a moment to open issues for the errors you need to fix.
-**React to the slack message with ✅ when you're finished opening issues or now
-if you're code is already lint-free.**
+**React to the slack message with ✅ when you're finished opening issues** or 
+now if you're code is already lint-free.
+::::
+
+:::{.callout-caution}
+# Are your tests failing?
+If you have some failing tests, the workflow will fail before it gets to the
+lint & style step. You can temporarily comment-out the test step with hashes 
+(`#`) so you can continue through this tutorial, but _don't forget_ to uncomment
+these lines later!
+:::
+
+## Code coverage
+
+Code coverage is the percentage of your source code that is covered by unit tests.
+Generally the higher the code coverage, the better. However, a code coverage of
+100% doesn't guarantee that your package doesn't have any bugs, it only means
+that every line of code is run at least once by your test suite.
+It can be a useful metric to see where there are holes in your tests.
+
+Codecov.io is a free tool for open source projects that pairs nicely with GitHub
+Actions for generating code coverage reports! Let's set it up now.
+
+:::{.callout-tip}
+# login to codecov
+Go to <https://about.codecov.io/> and Login with GitHub.
+If this is the first time you're connecting Codecov and GitHub, you may need to
+grant Codecov permission to read your repositories.
+
+Once you're logged in, you should see a list of all your GitHub repos (and maybe
+also those of any organizations you're a member of).
+Scroll down to your repo for this class and click `setup repo`.
+:::
+
+![](img/code-cov-repos.png)
+
+Follow the instructions on the next page to set up code coverage for your repo.
+
+![](img/code-cov-instructions.png)
+
+:::{.callout-warning collapse="true"}
+Your `CODECOV_TOKEN` should be kept secret. Don't paste it anywhere except for
+in your repository's Actions secrets.
+:::
+
+#### You'll need to make sure the test suite generates a report that codecov can ingest.
+
+For Python, you'll need to install an additonal plugin called `pytest-cov` and
+set the `--cov` flag when you run `pytest`.
+You can paste the codecov step anywhere after the test step of your workflow.
+
+Running pytest with `--cov` generates an xml file. You don't want to track that
+with git, so add `coverage.xml` to your gitignore file:
+```{text}
+#| filename: "Py .gitignore"
+__pycache__/
+coverage.xml
+```
+
+```{yaml}
+#| filename: "codecov Py .github/workflows/ci.yml"
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  actor: "41898282+github-actions[bot]"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov black flake8 # add pytest-cov plugin
+        if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+        fi
+    - name: Configure git
+      run: |
+        git config --local user.email "${actor}@users.noreply.github.com"
+        git config --local user.name "$actor"
+    - name: Test
+      run: |
+        pytest --cov=bionitio tests/ # specify your package & test paths
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+    - name: Format & lint
+      run: |
+        black .
+        flake8 --extend-ignore E203 --max-line-length 88 .
+    - name: Commit and push changes
+      run: |
+        git add .
+        git commit -m "🎨 Style code" || echo "No changes to commit"
+        git push
+```
+
+For R, the `covr` package runs the test suite, generates a report, and uploads
+it to codecov all with one function. You won't need codecov's 
+
+
+```{yaml}
+#| filename: "codecov R .github/workflows/ci.yml"
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  actor: "41898282+github-actions[bot]"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck, any::styler, any::lintr any::covr
+          needs: check
+          working-directory: bionitio
+      - name: Configure git
+        run: |
+          git config --local user.email "${actor}@users.noreply.github.com"
+          git config --local user.name "$actor"
+      - name: Check
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--no-manual", "--as-cran")'
+          working-directory: bionitio
+      - name: Style & lint
+        run: |
+            styler::style_dir(".")
+            lintr::lint_dir(".")
+        shell: Rscript {0}
+      - name: Test coverage
+        run: covr::codecov(path = "bionitio")  # set your package path here
+        shell: Rscript {0}
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "🎨 Style code" || echo "No changes to commit"
+          git push
+
+```
+
+
+Once your modified CI workflow has completed successfully with the new `codecov`
+step, you'll be able to view coverage reports for your repo on codecov.io and
+see them in your pull requests.
+If your tests aren't passing, codecov won't be able to generate a report.
+
+![](/img/codecov-report.png)
+
+:::{.callout-tip}
+# codecov setup
+**React to the Slack message with ✅ once your CI workflow completes
+successfully with codecov and you can see the coverage report.**
+:::
+
+### codecov status badge
+
+Codecov has a nifty status badge that we can display in our README file too.
+
+At <https://codecov.io>, go to your project, click `Settings`, and select
+`Badges & Graphs`. Under the 'Markdown' heading, copy the chunk, then paste it
+into your README file right after your CI badge.
+
+```{md}
+#| filename: README.md
+
+# bionitio-python
+
+[![ci](https://github.com/kelly-sovacool/bionitio-python/actions/workflows/ci.yml/badge.svg)](https://github.com/kelly-sovacool/bionitio-python/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/kelly-sovacool/bionitio-python/branch/main/graph/badge.svg?token=0COhziXR0s)](https://codecov.io/gh/kelly-sovacool/bionitio-python)
+```
+
+![](img/codecov-badge-readme.png)
+
+The color of the badge changes from red to green as coverage increases.
+
+:::{.callout-tip}
+# codecov badge
+**React to the Slack message with ✅ once you've added the `codecov` badge to 
+your README.**
 :::
 
 ## Document
@@ -547,13 +780,9 @@ if you're code is already lint-free.**
 
 GitHub Pages will host your docs for free!
 
-## Code coverage
+# Resources
 
-codecov is free for open source projects!
-
-### codecov status badge
-
-# Related topics & resources to explore
+Related topics & resources to explore
 
 - Other ways to trigger workflows
     - On release
@@ -564,3 +793,7 @@ codecov is free for open source projects!
 - Pre-commit hooks
     - Run checks, style code, etc before you even commit
 - More actions created by Posit: https://github.com/r-lib/actions
+- More fun GitHub badges: <https://shields.io>
+
+We have done all of this work in one workflow, but you can have multiple
+workflows for your project.
