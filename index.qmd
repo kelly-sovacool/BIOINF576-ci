@@ -43,7 +43,7 @@ name: build
 # A typical git workflow
 
 The current best practice for using git to manage collaborative software
-projects is known as 
+projects is known as
 [trunk-based development](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development).
 Under this model, small changes are frequently made in different branches, then
 merged into the main "trunk" (i.e. the main or master branch) of the repo after
@@ -70,8 +70,8 @@ passing peer review. The steps look like this:
 1. Celebrate that you resolved an issue!
 :::
 
-You can have multiple issues open at any stage of the process at a time. 
-You might start working on a feature, switch to fixing a time-sensitive bug and 
+You can have multiple issues open at any stage of the process at a time.
+You might start working on a feature, switch to fixing a time-sensitive bug and
 resolve it, then later go back to working on that feature.
 Meanwhile, collaborators are working on other issues too!
 This process enables highly collaborative and asynchronous work.
@@ -80,15 +80,15 @@ This process enables highly collaborative and asynchronous work.
 
 > git + ci = magic ✨
 
-It would be a bummer if you or a collaborator forgot a crucial step of the 
-process, like running the unit tests or linting your code, and accidentally 
+It would be a bummer if you or a collaborator forgot a crucial step of the
+process, like running the unit tests or linting your code, and accidentally
 merged buggy/broken/bad code into the main branch of your project.
 The good news is: You don't have to remember everything! Let the machines do it for you automatically!
 
-**Continuous integration** is a practice where tests and other code quality checks 
+**Continuous integration** is a practice where tests and other code quality checks
 are automatically run before code changes are merged into the main branch.
 
-How does this modify our git workflow? When we open a pull request or push a 
+How does this modify our git workflow? When we open a pull request or push a
 commit to main, the CI service will run a workflow we define to run our checks,
 so we don't have to do it manually!
 
@@ -102,24 +102,24 @@ so we don't have to do it manually!
 - Azure DevOps
 :::
 
-We'll use GitHub Actions because it's easy to setup when you already have your 
+We'll use GitHub Actions because it's easy to setup when you already have your
 repo hosted on GitHub, and they provide a lot of computing resources for free.
 
 # Building a CI workflow with GitHub Actions
 
 We're going to create a CI workflow that runs on all pushes and pull requests to
  the default branch (typically "main" or "master").
-Workflows are defined with YAML files to specify how to configure the machine 
+Workflows are defined with YAML files to specify how to configure the machine
 that runs the workflow, install dependencies, and run commands.
 
-Let's start by creating a small workflow that prints "Hello, world!" and lists 
+Let's start by creating a small workflow that prints "Hello, world!" and lists
 the files in the package.
 
 I will demonstrate with two example packages: [bionitio-r](https://github.com/kelly-sovacool/bionitio-r) and [bionitio-python](https://github.com/kelly-sovacool/bionitio-python).
 
-## Configure Actions permissions
+## Configure permissions
 
-Before we can get started using GitHub Actions, we'll need to make sure we 
+Before we can get started using GitHub Actions, we'll need to make sure we
 configure our repo settings to allow Actions to run and push changes.
 
 :::{.callout-tip}
@@ -142,52 +142,50 @@ Next, scroll down to the bottom of the page. Under 'Workflow permissions', selec
 
 Now we're ready to start using GitHub Actions for our projects!
 
-## Getting started with a simple action
+## Getting started
 
 Every GitHub Actions workflow resides in `.github/workflows/` and needs:
 
 - `on` -- events that trigger the workflow
 - `jobs` -- list of independent jobs each with `steps` to run in sequence.
-- `steps` -- each step specifies a third party action to uses with `uses`, 
+- `steps` -- each step specifies a third party action to uses with `uses`,
   or specifies shell code to `run`.
 
 ```{#lst-greet .yaml lst-cap="`.github/workflows/greet.yml`"}
 # name of the workflow
-name: greet 
+name: greet
 
 # when the workflow should run
-on: 
+on:
   push:
     branches:
       - main
       - master
   pull_request:
-    branches: 
+    branches:
       - main
       - master
 
 # independent jobs in the workflow
-jobs: 
+jobs:
   # this workflow just has one job called "greet"
-  greet: 
+  greet:
     # the operating system to use for this workflow
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     # list of steps in the workflow
-    steps: 
+    steps:
       # use an action provided by github to checkout the repo
-      - uses: actions/checkout@v3 
-      
+      - uses: actions/checkout@v3
       # a custom step that runs a couple shell commands
-      - name: List 
+      - name: List
         run: |
             echo "listing files in the bioinitio directory"
             ls bionitio
-      
       # a custom step that runs R code
-      - name: Greet 
+      - name: Greet
         run: print("Hello, world!")
         # Replace `shell: Rscript {0}` with `shell: python {0}` to run Python code instead!
-        shell: Rscript {0}  
+        shell: Rscript {0}
 ```
 
 ::: {.callout-tip}
@@ -204,21 +202,23 @@ jobs:
 :::
 
 Did your workflow run?
-On GitHub, go to the Actions tab of your repo. 
+On GitHub, go to the Actions tab of your repo.
 Opening the pull request should have triggered the workflow to run.
 
-Once the workflow finishes (about 15 seconds), it will either have a green 
+Once the workflow finishes (about 15 seconds), it will either have a green
 checkmark (✅) for success or a red X (❌) for failure.
 
 ![](img/actions-greet.png)
 
 **Click on the workflow run.** Then under 'jobs', **click on the job 'greet'.**
-You're now viewing the log file for the job. 
+You're now viewing the log file for the job.
 You can click on the arrows to expand the details for each step.
 
 ![](img/actions-greet-job-log.png)
 
 You can also see the status of the action from the Pull Request summary page.
+Keep your pull request open. We're going to continue pushing commits to the `ci`
+branch as we add new steps to the workflow.
 
 ::: {.callout-tip}
 # `greet` status
@@ -229,10 +229,10 @@ In Slack, react with ✅ or ❌ to indicate the status of your workflow.
 
 ## Test suite
 
-This initial "hello world" workflow is cute, but not very useful. 
+This initial "hello world" workflow is cute, but not very useful.
 Let's edit the workflow to run our test suite for us automatically!
 
-**R**: use `devtools::test()` to run just the tests, 
+**R**: use `devtools::test()` to run just the tests,
 or `devtools::check()` to run all checks for CRAN.
 
 ```{yaml}
@@ -273,9 +273,9 @@ jobs:
 ```
 
 ::: {.callout-note}
-The r-lib actions assume that the top level of your repo is the same as the top 
+The r-lib actions assume that the top level of your repo is the same as the top
 level of your R package. If that's not the case, you'll need to specify the
-`working-directory`. 
+`working-directory`.
 
 For my example project, `bionitio-r` is the top level of the git repo, and from
 there the R package resides in `bionitio`:
@@ -283,17 +283,17 @@ there the R package resides in `bionitio`:
 bionitio-r
 ├── README.md
 ├── .github
-│   └── workflows
-│       └── ci.yml
+│   └── workflows
+│       └── ci.yml
 ├── bionitio
-│   ├── DESCRIPTION
-│   ├── R
-│   │   ├── bionitio.R
-│   │   └── file_utils.R
-│   └── tests
-│       ├── testthat
-│       │   └── test-stats.R
-│       └── testthat.R
+│   ├── DESCRIPTION
+│   ├── R
+│   │   ├── bionitio.R
+│   │   └── file_utils.R
+│   └── tests
+│       ├── testthat
+│       │   └── test-stats.R
+│       └── testthat.R
 ```
 :::
 
@@ -326,7 +326,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest
-        if [ -f requirements.txt ]; then 
+        if [ -f requirements.txt ]; then
             pip install -r requirements.txt
         fi
     - name: Test with pytest
@@ -335,7 +335,7 @@ jobs:
 ```
 
 
-In each of these workflows, the action checks out the repo, installs R or Python, 
+In each of these workflows, the action checks out the repo, installs R or Python,
 installs the dependencies of the package, then runs the tests.
 If any of your tests fail, the whole actions workflow will fail too.
 
@@ -356,15 +356,15 @@ or now if the workflow completed successfully.
 ### Workflow status badges
 
 Each Actions workflow has a status badge that indicates whether the action is
-passing or failing. 
-You may have come across status badges in GitHub README files of packages you use. 
-Putting a CI status badge in the README file is a popular way for project 
+passing or failing.
+You may have come across status badges in GitHub README files of packages you use.
+Putting a CI status badge in the README file is a popular way for project
 maintainers to prominently display that CI is set up and it's working!
 
 ::: {.callout-tip}
 ### Add the workflow status badge to your README
 
-Under the Actions tab, click the name of the workflow (e.g. `ci`), click the 
+Under the Actions tab, click the name of the workflow (e.g. `ci`), click the
 triple dots menu (`...`) in the upper right corner, and select `Create status badge`.
 
 In the pop-up menu, click `Copy status badge Markdown`, paste it into your
@@ -384,15 +384,15 @@ continuous integration!
 
 ## Lint and style code
 
-Many large software projects follow a specific coding style guide to make sure 
+Many large software projects follow a specific coding style guide to make sure
 their code base is consistent and easy to read.
 
-> Good coding style is like correct punctuation: you can manage without it, 
+> Good coding style is like correct punctuation: you can manage without it,
 > butitsuremakesthingseasiertoread.
 >
 > – [The Tidyverse Style Guide](https://style.tidyverse.org/index.html)
 
-A linter checks your code to make sure you conform to a style guide and raises 
+A linter checks your code to make sure you conform to a style guide and raises
 warnings if your code doesn't conform.
 A code formatter or styler modifies your code to make it conform to a style guide.
 There is a lot of overlap in the problems that linters and formatters can catch,
@@ -404,7 +404,7 @@ problems like syntax errors.
 | R        | [linter](https://lintr.r-lib.org/) | [styler](https://styler.r-lib.org/)    |
 | Python   | [flake8](https://flake8.pycqa.org/en/latest/) | [black](https://black.readthedocs.io/en/stable/#)     |
 
-When adding these tools to CI, make sure you run the formatter _before_ the 
+When adding these tools to CI, make sure you run the formatter _before_ the
 linter, so the linter will only complain about problems that the formatter can't
 fix.
 Since the code formatter modifies our code, we will also need to commit and push
@@ -531,10 +531,10 @@ jobs:
 ```
 
 ::: {.callout-note}
-flake8 is not 100% compatible with black by default. 
+flake8 is not 100% compatible with black by default.
 Here we direct flake8 to ignore one of its errors (`--extend-ignore E203`) and
-increase the maximum allowed line length (`--max-line-length 88`) to [make flake8
-compatible with black](https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8).
+increase the maximum allowed line length (`--max-line-length 88`) to
+[make flake8 compatible with black](https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8).
 :::
 
 There are several key changes we made to this workflow to make sure our styling
@@ -542,7 +542,7 @@ and linting would work:
 
 1. Set a global environment variable called `actor` with the username of the
    GitHub Actions bot.
-1. Configure the git username and email to point to the GitHub Actions bot, 
+1. Configure the git username and email to point to the GitHub Actions bot,
    using the environment variable we created in above.
 1. Install additional dependencies for linting and formatting the code.
 1. Run the code formatter and linter.
@@ -556,14 +556,14 @@ and see what happens when you push it to GitHub.
 
 Does the linter raise any errors?
 If so, take a moment to open issues for the errors you need to fix.
-**React to the slack message with ✅ when you're finished opening issues** or 
+**React to the slack message with ✅ when you're finished opening issues** or
 now if you're code is already lint-free.
 ::::
 
 :::{.callout-caution}
 # Are your tests failing?
 If you have some failing tests, the workflow will fail before it gets to the
-lint & style step. You can temporarily comment-out the test step with hashes 
+lint & style step. You can temporarily comment-out the test step with hashes
 (`#`) so you can continue through this tutorial, but _don't forget_ to uncomment
 these lines later!
 :::
@@ -593,17 +593,27 @@ Scroll down to your repo for this class and click `setup repo`.
 ![](img/code-cov-repos.png)
 
 Follow the instructions on the next page to set up code coverage for your repo.
+**Just do Step 1 and Step 2** now; we need to make some custom modifications to
+Step 3 for our projects.
 
 ![](img/code-cov-instructions.png)
 
-:::{.callout-warning collapse="true"}
+:::{.callout-warning}
 Your `CODECOV_TOKEN` should be kept secret. Don't paste it anywhere except for
 in your repository's Actions secrets.
 :::
 
-#### You'll need to make sure the test suite generates a report that codecov can ingest.
+:::{.callout-tip}
+## Codecov setup
+React to the message on Slack with 1️⃣ for Step 1 and 2️⃣ for Step 2 once you
+complete them. Don't do the other Steps yet.
+:::
 
-For Python, you'll need to install an additonal plugin called `pytest-cov` and
+## Edit the workflow
+
+We'll need to make sure the test suite generates a report that codecov can ingest.
+
+For **Python**, you'll need to install an additonal plugin called `pytest-cov` and
 set the `--cov` flag when you run `pytest`.
 You can paste the codecov step anywhere after the test step of your workflow.
 
@@ -668,9 +678,9 @@ jobs:
         git push
 ```
 
-For R, the `covr` package runs the test suite, generates a report, and uploads
-it to codecov all with one function. You won't need codecov's 
-
+For **R**, the `covr` package runs the test suite, generates a report, and uploads
+it to codecov all with one function. You don't need codecov's Action as in the
+Python workflow, because `covr` handles that for you.
 
 ```{yaml}
 #| filename: "codecov R .github/workflows/ci.yml"
@@ -734,23 +744,27 @@ jobs:
 Once your modified CI workflow has completed successfully with the new `codecov`
 step, you'll be able to view coverage reports for your repo on codecov.io and
 see them in your pull requests.
-If your tests aren't passing, codecov won't be able to generate a report.
+However, if your tests aren't passing, codecov won't be able to generate a report.
 
 ![](/img/codecov-report.png)
 
 :::{.callout-tip}
 # codecov setup
-**React to the Slack message with ✅ once your CI workflow completes
-successfully with codecov and you can see the coverage report.**
+**React to the Slack message** with:
+- ✅ once your CI workflow completes
+successfully with codecov and you can see the coverage report.
+- 🔨 if you need to fix your tests before the workflow can complete.
 :::
 
 ### codecov status badge
 
 Codecov has a nifty status badge that we can display in our README file too.
 
-At <https://codecov.io>, go to your project, click `Settings`, and select
-`Badges & Graphs`. Under the 'Markdown' heading, copy the chunk, then paste it
-into your README file right after your CI badge.
+Copy and paste the following into your README.md, then replace
+`GITHUB_USERNAME` and `GITHUB_REPO` in both the image and link URLs.
+```
+[![codecov](https://codecov.io/gh/GITHUB_USERNAME/GITHUB_REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/GITHUB_USERNAME/GITHUB_REPO)
+```
 
 ```{md}
 #| filename: README.md
@@ -758,18 +772,28 @@ into your README file right after your CI badge.
 # bionitio-python
 
 [![ci](https://github.com/kelly-sovacool/bionitio-python/actions/workflows/ci.yml/badge.svg)](https://github.com/kelly-sovacool/bionitio-python/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/kelly-sovacool/bionitio-python/branch/main/graph/badge.svg?token=0COhziXR0s)](https://codecov.io/gh/kelly-sovacool/bionitio-python)
+[![codecov](https://codecov.io/gh/kelly-sovacool/bionitio-python/branch/main/graph/badge.svg)](https://codecov.io/gh/kelly-sovacool/bionitio-python)
 ```
 
 ![](img/codecov-badge-readme.png)
 
 The color of the badge changes from red to green as coverage increases.
+If your tests aren't passing or the codecov upload action didn't work,
+it will display `unknown` as the coverage for now.
 
 :::{.callout-tip}
 # codecov badge
-**React to the Slack message with ✅ once you've added the `codecov` badge to 
+**React to the Slack message with ✅ once you've added the `codecov` badge to
 your README.**
 :::
+
+### Interpreting code coverage
+
+Generally, higher code coverage is better. However, 100% code coverage doesn't
+guarantee that your code is free of bugs, and not all code strictly needs to be
+tested.
+Focus on writing unit tests that test your assumptions about how your
+code works and test the most important components of your project.
 
 ## Document
 

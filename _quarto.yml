@@ -31,7 +31,7 @@ format:
   html:
     theme: spacelab
     toc: true
-    toc-depth: 5
+    toc-depth: 4
     toc-location: left
     date-format: iso
     embed-resources: true
