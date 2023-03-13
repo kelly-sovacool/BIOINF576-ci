@@ -75,6 +75,8 @@ You might start working on a feature, switch to fixing a time-sensitive bug and
 resolve it, then later go back to working on that feature.
 Meanwhile, collaborators are working on other issues too!
 This process enables highly collaborative and asynchronous work.
+Making changes in separate branches and merging them into main only after testing
+and peer review helps ensure that only high quality code is adopted.
 
 ## Continuous integration: what & why?
 
@@ -347,7 +349,9 @@ then commit and push your changes.
 Does the CI workflow succeed or fail?
 
 You may get failures if you haven't been running your unit tests as you develop
-your code base. Take a few minutes to open issues for each test that failed.
+your code base.
+Go to the workflow log file and expand the test step to see which tests failed.
+Take a few minutes to open issues for each test that failed.
 
 **React to the slack message with ✅ when you're finished opening issues**
 or now if the workflow completed successfully.
@@ -395,9 +399,9 @@ their code base is consistent and easy to read.
 A linter checks your code to make sure you conform to a style guide and raises
 warnings if your code doesn't conform.
 A code formatter or styler modifies your code to make it conform to a style guide.
-There is a lot of overlap in the problems that linters and formatters can catch,
-but linters additionally warn about not only style problems but more serious
-problems like syntax errors.
+There is a lot of overlap in the problems that linters and formatters can catch.
+However, linters additionally warn about not only style problems but also more
+serious problems like syntax errors.
 
 | language | linter | formatter |
 |----------|--------|-----------|
@@ -543,37 +547,34 @@ and linting would work:
 1. Set a global environment variable called `actor` with the username of the
    GitHub Actions bot.
 1. Configure the git username and email to point to the GitHub Actions bot,
-   using the environment variable we created in above.
+   using the environment variable we created as above.
 1. Install additional dependencies for linting and formatting the code.
 1. Run the code formatter and linter.
 1. Commit any changes and push to origin.
 
 ::::{.callout-tip}
 # Style & lint your code
-
-You know the drill! Modify your workflow to style and lint your code,
+Modify your workflow to style and lint your code,
 and see what happens when you push it to GitHub.
 
 Does the linter raise any errors?
 If so, take a moment to open issues for the errors you need to fix.
 **React to the slack message with ✅ when you're finished opening issues** or
-now if you're code is already lint-free.
+now if your code is already lint-free.
 ::::
 
 :::{.callout-caution}
 # Are your tests failing?
 If you have some failing tests, the workflow will fail before it gets to the
-lint & style step. You can temporarily comment-out the test step with hashes
-(`#`) so you can continue through this tutorial, but _don't forget_ to uncomment
-these lines later!
+lint & style step. You can temporarily comment-out any failing steps with hashes
+(`#`) so you can continue through this tutorial, but _don't forget to uncomment
+these lines later!_
 :::
 
 ## Code coverage
 
 Code coverage is the percentage of your source code that is covered by unit tests.
-Generally the higher the code coverage, the better. However, a code coverage of
-100% doesn't guarantee that your package doesn't have any bugs, it only means
-that every line of code is run at least once by your test suite.
+Generally the higher the code coverage, the better.
 It can be a useful metric to see where there are holes in your tests.
 
 Codecov.io is a free tool for open source projects that pairs nicely with GitHub
@@ -789,20 +790,44 @@ your README.**
 
 ### Interpreting code coverage
 
-Generally, higher code coverage is better. However, 100% code coverage doesn't
-guarantee that your code is free of bugs, and not all code strictly needs to be
-tested.
+Generally, higher code coverage is better.
+However, a code coverage of
+100% doesn't guarantee that your package doesn't have any bugs, it only means
+that every line of code is run at least once by your test suite.
+Not all code strictly needs to be tested; very few software projects have a code
+coverage anywhere close to 100%.
 Focus on writing unit tests that test your assumptions about how your
-code works and test the most important components of your project.
+code works, and prioritize testing the most important components of your project.
 
 ## Document
 
-- R: roxygen2
+- R: roxygen2 & pkgdown
 - Python: sphinx
 
 ### Setup a documentation website
 
 GitHub Pages will host your docs for free!
+
+# Wrap-up
+
+If you commented-out any failing steps in your CI workflow (e.g. if unit tests
+failed), uncomment those now.
+Before working on any other issues, you should fix those issues.
+
+Once your CI workflow has completed successfully on the `ci` branch, assign your
+partner to review the Pull Request. PR reviewers: only approve your partner's PR
+if the CI workflow is working! You can merge your PR into `main` if the CI
+workflow completes and the reviewer approves the PR.
+
+Ideally, you should make all changes in a branch that's separate from `main`,
+then open a PR once you think your code resolves the issue you're working on.
+Your CI workflow will then run the code quality checks we explored above.
+If any CI steps failed, fix your code until they succeed.
+Finally, have another person review your PR to check for things that the CI
+workflow can't, like whether your code appropriately solves the problem or
+implements the feature you set out to address.
+These extra steps help assure that all changes follow best practices in software
+engineering before adopting them into the code base.
 
 # Resources
 
