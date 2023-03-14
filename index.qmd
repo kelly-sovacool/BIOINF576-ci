@@ -731,15 +731,14 @@ jobs:
             styler::style_dir(".")
             lintr::lint_dir(".")
         shell: Rscript {0}
-      - name: Test coverage
-        run: covr::codecov(path = "bionitio")  # set your package path here
-        shell: Rscript {0}
       - name: Commit and push changes
         run: |
           git add .
           git commit -m "🎨 Style code" || echo "No changes to commit"
           git push
-
+      - name: Test coverage
+        run: covr::codecov(path = "bionitio")  # set your package path here
+        shell: Rscript {0}
 ```
 
 
@@ -799,15 +798,6 @@ Not all code strictly needs to be tested; very few software projects have a code
 coverage anywhere close to 100%.
 Focus on writing unit tests that test your assumptions about how your
 code works, and prioritize testing the most important components of your project.
-
-## Document
-
-- R: roxygen2 & pkgdown
-- Python: sphinx
-
-### Setup a documentation website
-
-GitHub Pages will host your docs for free!
 
 # Wrap-up
 
