@@ -191,20 +191,91 @@ jobs:
         shell: Rscript {0}
 ```
 
-::: {.callout-tip}
-
+:::: {.callout-tip}
 ## Create the "Hello world" action
 
 1. Open an issue with the title "Set up continuous integration".
+
+   ::: {.callout-note collapse="true"}
+   #### Hint
+   On GitHub, go to the Issues tab and click `New issue`.
+   Give your issue a descriptive title and description.
+   ![](img/issue-desc.png)
+   :::
+
 1. Switch to a new branch called `ci`.
-1. Add the workflow (@lst-greet) to your repo at `.github/workflows/greet.yml`.
-1. Replace `bionitio` with the name of your package.
+
+   ::: {.callout-note collapse="true"}
+   #### Hint
+   From a Unix terminal:
+   ```{shell}
+   cd path/to/your/project
+   git switch -c ci
+   ```
+   :::
+
+1. Add the workflow to your repo at `.github/workflows/greet.yml`.
+
+   ::: {.callout-note collapse="true"}
+   #### Hint
+   Make the directories and create a blank YAML file.
+   ```{shell}
+   mkdir -p .github/workflows
+   touch .github/workflows/greet.yml
+   ```
+   Open the file in your preferred text editor. e.g. for VS Code:
+   ```{shell}
+   code .github/workflows/greet.yml
+   ```
+   Paste in @lst-greet
+   :::
+
+1. Replace `bionitio` with the name of your package and save the workflow file.
+
+   ::: {.callout-note collapse="true"}
+   #### Hint
+   The package subdirectory is referenced twice in the [`List` step](#lst-greet-26).
+
+   Don't forget to save the file after you edit it!
+   :::
+
 1. Commit and push it to GitHub.
+
+   ::: {.callout-note collapse="true"}
+   #### Hint
+   Stage the new file, commit the changes with a descriptive message, and push
+   it to GitHub.
+   ```
+   git add .github/workflows/greet.yml
+   git commit -m "Create greet workflow"
+   git push
+   ```
+   :::
+
 1. Finally, open a pull request from your new branch into main.
 
-:::
+   ::: {.callout-note collapse="true"}
+   #### Hint
+   On GitHub, go the Pull requests tab and click `Compare & pull request` for
+   the `ci` branch.
 
-Did your workflow run?
+   ![](img/ci-recent-pushes.png)
+
+   Give the pull request (PR) a short and informative title.
+   In the PR description, write `Resolves #` followed by the issue number you
+   opened in Step 1.
+
+   ![](img/pr-desc.png)
+
+   Click `Create pull request`.
+   When you merge the PR later, it will automatically close the issue too.
+
+   :::
+
+::::
+
+##### Did your workflow run?
+
 On GitHub, go to the Actions tab of your repo.
 Opening the pull request should have triggered the workflow to run.
 
@@ -474,6 +545,8 @@ fix.
 Since the code formatter modifies our code, we will also need to commit and push
 the code changes using the GitHub Actions bot as the author.
 
+#### R
+
 ```{yaml}
 #| filename: "style R .github/workflows/ci.yml"
 name: CI
@@ -527,6 +600,9 @@ jobs:
           git commit -m "🎨 Style code" || echo "No changes to commit"
           git push
 ```
+
+
+#### Python
 
 ```{yaml}
 #| filename: "style Py .github/workflows/ci.yml"
@@ -586,7 +662,7 @@ increase the maximum allowed line length (`--max-line-length 88`) to
 [make flake8 compatible with black](https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8).
 :::
 
-There are several key changes we made to this workflow to make sure our styling
+There are several key changes we made to the workflow to make sure our styling
 and linting would work:
 
 1. Set a global environment variable called `actor` with the username of the
@@ -659,6 +735,8 @@ complete them. Don't do the other Steps yet.
 
 We'll need to make sure the test suite generates a report that codecov can ingest.
 
+#### Python
+
 For **Python**, you'll need to install an additonal plugin called `pytest-cov` and
 set the `--cov` flag when you run `pytest`.
 You can paste the codecov step anywhere after the test step of your workflow.
@@ -723,6 +801,9 @@ jobs:
         git commit -m "🎨 Style code" || echo "No changes to commit"
         git push
 ```
+
+
+#### R
 
 For **R**, the `covr` package runs the test suite, generates a report, and uploads
 it to codecov all with one function. You don't need codecov's Action as in the
