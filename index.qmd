@@ -1,7 +1,7 @@
 ---
 title: "Developing Bioinformatics Software: Continuous Integration"
 author: Kelly Sovacool
-date: last-modified
+date: 2023-03-15
 categories:
     - R
     - Python
@@ -832,6 +832,9 @@ resources to explore.
 
 - [Branch protection rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches)
     - Prevent PRs from getting merged into `main` until checks pass.
+- Build docs and deploy a website with [GitHub Pages](https://pages.github.com/)
+    - R: [`usethis::use_pkgodwn()`](https://usethis.r-lib.org/reference/use_pkgdown.html)
+    - Python: [`Sphinx`](https://www.sphinx-doc.org/en/master/index.html)
 - Other ways to trigger workflows
     - On release
     - [Manual dispatch](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow)
