@@ -799,6 +799,41 @@ coverage anywhere close to 100%.
 Focus on writing unit tests that test your assumptions about how your
 code works, and prioritize testing the most important components of your project.
 
+## Document
+
+TODO
+
+- R: roxygen2 & pkgdown
+- Python: sphinx
+
+##### R
+
+The `devtools` package has a `document()` function that generates your package
+documentation files with `roxygen2`. These files in `man/` are used by R to
+generate the manual pages that you can read in the `Help` pane of RStudio.
+You can take it a step further and also build a website for users to read your
+docs on the web using `pkgdown`.
+
+First we'll need to setup pkgdown to work with our package.
+If you don't already have `usethis` and `pkgdown` installed, first install them
+(e.g. in an R console or with mamba).
+Then, you can run `usethis::use_pkgdown()` from your R package directory.
+This will create/modify these files:
+
+- `.Rbuildignore`
+- `.gitignore`
+- `_pkgdown.yml`
+
+##### Python
+
+TODO
+
+### GitHub Pages
+
+GitHub Pages will host your website for free!
+
+TODO
+
 # Wrap-up
 
 If you commented-out any failing steps in your CI workflow (e.g. if unit tests
