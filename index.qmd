@@ -239,7 +239,7 @@ Let's edit the workflow to run our test suite for us automatically!
 or `devtools::check()` to run all checks for CRAN.
 
 ```{yaml}
-#| filename: "test R .github/workflows/ci.ym`"
+#| filename: "test R .github/workflows/ci.yml"
 name: CI
 
 on:
@@ -750,22 +750,26 @@ However, if your tests aren't passing, codecov won't be able to generate a repor
 ![](/img/codecov-report.png)
 
 :::{.callout-tip}
-# codecov setup
+# Codecov report
 **React to the Slack message** with:
+
 - ✅ once your CI workflow completes
 successfully with codecov and you can see the coverage report.
 - 🔨 if you need to fix your tests before the workflow can complete.
 :::
 
-### codecov status badge
+### Codecov status badge
 
 Codecov has a nifty status badge that we can display in our README file too.
 
 Copy and paste the following into your README.md, then replace
 `GITHUB_USERNAME` and `GITHUB_REPO` in both the image and link URLs.
+
 ```
 [![codecov](https://codecov.io/gh/GITHUB_USERNAME/GITHUB_REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/GITHUB_USERNAME/GITHUB_REPO)
 ```
+
+Here's what my project README looks like now:
 
 ```{md}
 #| filename: README.md
@@ -783,7 +787,7 @@ If your tests aren't passing or the codecov upload action didn't work,
 it will display `unknown` as the coverage for now.
 
 :::{.callout-tip}
-# codecov badge
+# Codecov badge
 **React to the Slack message with ✅ once you've added the `codecov` badge to
 your README.**
 :::
