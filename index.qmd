@@ -235,7 +235,8 @@ In Slack, react with ✅ or ❌ to indicate the status of your workflow.
 This initial "hello world" workflow is cute, but not very useful.
 Let's edit the workflow to run our test suite for us automatically!
 
-**R**: use `devtools::test()` to run just the tests,
+#### R
+use `devtools::test()` to run just the tests,
 or `devtools::check()` to run all checks for CRAN.
 
 ```{yaml}
@@ -300,7 +301,8 @@ bionitio-r
 ```
 :::
 
-**Python**: use `pytest` to run the test suite.
+#### Python
+Use `pytest` to run the test suite.
 
 ```{yaml}
 #| filename: "test Py .github/workflows/ci.yml"
@@ -337,6 +339,46 @@ jobs:
         pytest .
 ```
 
+:::{.callout-note}
+# Dependencies
+Have you been keeping track of your package's dependencies?
+Be sure to add them according to the instructions below!
+If you need a certain minimum version of a package, you can specify the version
+number with `PACKAGE >= VERSION`, e.g. `biopython >= 1.70`.
+
+#### R imports
+If your package depends on any other packages, you need to add them to
+`DESCRIPTION` under `Imports` for required dependencies or `Suggests` if only
+needed for some functions. `bionitio-r` needs two R packages, so they're listed
+like so:
+
+```{text}
+#| filename: "bionitio/DESCRIPTION"
+Package: bionitio
+Type: Package
+Title: Calculate FASTA statistics
+Version: 0.1.0
+Description: This package reads in one or more input FASTA files and calculates
+    a variety of statistics.
+License: MIT + file LICENSE
+Imports:
+    seqinr,
+    logging
+Suggests:
+    devtools,
+    testthat
+```
+
+
+#### Python requirements
+If your package depends on any other packages, you need to add them to
+`requirements.txt`. `bionitio-python` needs one Python package listed like so:
+
+```{text}
+#| filename: "bionitio/requirements.txt"
+biopython >= 1.70
+```
+:::
 
 In each of these workflows, the action checks out the repo, installs R or Python,
 installs the dependencies of the package, then runs the tests.
@@ -349,13 +391,14 @@ In your `ci` branch, modify your CI workflow to run the test suite,
 then commit and push your changes.
 Does the CI workflow succeed or fail?
 
-You may get failures if you haven't been running your unit tests as you develop
-your code base.
-Go to the workflow log file and expand the test step to see which tests failed.
+You may get failures if you haven't been running your unit tests or tracking
+dependencies as you develop your code base.
+Go to the workflow log file and expand the test step to see why it failed.
 Take a few minutes to open issues for each test that failed.
+If the problem is with your
 
-**React to the slack message with ✅ when you're finished opening issues**
-or now if the workflow completed successfully.
+**React to the slack message with ✅ when you're finished** opening issues,
+fixing dependencies, or now if the workflow completed successfully.
 :::
 
 ### Workflow status badges
