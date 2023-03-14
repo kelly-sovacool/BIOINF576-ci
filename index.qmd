@@ -611,7 +611,7 @@ React to the message on Slack with 1️⃣ for Step 1 and 2️⃣ for Step 2 onc
 complete them. Don't do the other Steps yet.
 :::
 
-## Edit the workflow
+### Add codecov to the workflow
 
 We'll need to make sure the test suite generates a report that codecov can ingest.
 
