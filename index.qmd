@@ -104,13 +104,14 @@ so we don't have to do it manually!
 - Azure DevOps
 :::
 
-We'll use GitHub Actions because it's easy to setup when you already have your
-repo hosted on GitHub, and they provide a lot of computing resources for free.
+We'll use [GitHub Actions](https://docs.github.com/en/actions) because it's easy
+to setup, you're alraedy using GitHub for your projects,
+and they provide a lot of computing resources for free.
 
 # Building a CI workflow with GitHub Actions
 
 We're going to create a CI workflow that runs on all pushes and pull requests to
- the default branch (typically "main" or "master").
+the default branch (typically "main" or "master").
 Workflows are defined with YAML files to specify how to configure the machine
 that runs the workflow, install dependencies, and run commands.
 
@@ -826,23 +827,23 @@ If any CI steps failed, fix your code until they succeed.
 Finally, have another person review your PR to check for things that the CI
 workflow can't, like whether your code appropriately solves the problem or
 implements the feature you set out to address.
-These extra steps help assure that all changes follow best practices in software
-engineering before adopting them into the code base.
+Following this protocol helps assure that all changes follow best practices in
+software engineering before adopting them into the code base.
 
 # Resources
 
-Related topics & resources to explore
+We only scratched the surface on what you can do with continuous integration
+services and GitHub Actions specifically. Here are related topics and other
+resources to explore.
 
+- [Branch protection rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches)
+    - Prevent PRs from getting merged into `main` until checks pass.
 - Other ways to trigger workflows
     - On release
-    - Manual dispatch
-    - Cron schedule
-- Branch protection
-    - Prevent PRs from getting merged until checks pass.
-- Pre-commit hooks
-    - Run checks, style code, etc before you even commit
-- More actions created by Posit: https://github.com/r-lib/actions
+    - [Manual dispatch](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow)
+    - [Cron schedule](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule)
+    - Many others listed in the [GitHub Docs](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows)
+- [Pre-commit hooks](https://pre-commit.com/)
+    - Run checks, style code, etc. before you even commit!
+- More actions created by Posit: [r-lib/actions](https://github.com/r-lib/actions)
 - More fun GitHub badges: <https://shields.io>
-
-We have done all of this work in one workflow, but you can have multiple
-workflows for your project.
