@@ -339,6 +339,10 @@ jobs:
         pytest .
 ```
 
+In each of these workflows, the action checks out the repo, installs R or Python,
+installs the dependencies of the package, then runs the tests.
+If any of your tests fail, the whole actions workflow will fail too.
+
 :::{.callout-note}
 # Dependencies
 Have you been keeping track of your package's dependencies?
@@ -380,10 +384,6 @@ biopython >= 1.70
 ```
 :::
 
-In each of these workflows, the action checks out the repo, installs R or Python,
-installs the dependencies of the package, then runs the tests.
-If any of your tests fail, the whole actions workflow will fail too.
-
 ::: {.callout-tip}
 ## Testing with CI
 
@@ -395,7 +395,7 @@ You may get failures if you haven't been running your unit tests or tracking
 dependencies as you develop your code base.
 Go to the workflow log file and expand the test step to see why it failed.
 Take a few minutes to open issues for each test that failed.
-If the problem is with your
+If the problem is with your dependencies, fix them now.
 
 **React to the slack message with ✅ when you're finished** opening issues,
 fixing dependencies, or now if the workflow completed successfully.
