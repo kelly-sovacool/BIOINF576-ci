@@ -277,6 +277,7 @@ jobs:
 ```
 
 ::: {.callout-note}
+# Repo tree
 The r-lib actions assume that the top level of your repo is the same as the top
 level of your R package. If that's not the case, you'll need to specify the
 `working-directory`.
@@ -298,6 +299,21 @@ bionitio-r
 │       ├── testthat
 │       │   └── test-stats.R
 │       └── testthat.R
+```
+:::
+
+::: {.callout-note}
+# Ignore check dir
+The `check-r-package` action creates files in `/package/check/`. We don't want
+git to track them, so we need to add the `check` dir to the gitignore file:
+
+```{text}
+#| filename: "R .gitignore"
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+check/
 ```
 :::
 
@@ -511,21 +527,6 @@ jobs:
           git commit -m "🎨 Style code" || echo "No changes to commit"
           git push
 ```
-
-
-::: {.callout-note}
-The `check-r-package` action creates files in `/package/check/`. We don't want
-git to track them, so we need to add the check dir to the gitignore file:
-
-```{text}
-#| filename: "R .gitignore"
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-check/
-```
-:::
 
 ```{yaml}
 #| filename: "style Py .github/workflows/ci.yml"
