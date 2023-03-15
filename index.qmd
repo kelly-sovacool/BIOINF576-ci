@@ -466,7 +466,7 @@ If your package depends on any other packages, you need to add them to
 `requirements.txt`. `bionitio-python` needs one Python package listed like so:
 
 ```{text}
-#| filename: "bionitio/requirements.txt"
+#| filename: "requirements.txt"
 biopython >= 1.70
 ```
 :::
